@@ -446,11 +446,13 @@ LRESULT ScalingWindow::_MessageHandler(UINT msg, WPARAM wParam, LPARAM lParam) n
 				DwmExtendFrameIntoClientArea(Handle(), &margins);
 			}
 
-			if (_srcTracker.WindowKind() == SrcWindowKind::NoNativeFrame && Win32Helper::GetOSVersion().IsWin11()) {
-				// Win11 中禁用边框和圆角以模仿 NoNativeFrame 的样式
-				COLORREF color = DWMWA_COLOR_NONE;
-				DwmSetWindowAttribute(Handle(), DWMWA_BORDER_COLOR, &color, sizeof(color));
-
+			if (Win32Helper::GetOSVersion().IsWin11()) {
+				if (_srcTracker.WindowKind() == SrcWindowKind::NoNativeFrame) {
+					// Win11 中禁用边框以模仿 NoNativeFrame 的样式
+					COLORREF color = DWMWA_COLOR_NONE;
+					DwmSetWindowAttribute(Handle(), DWMWA_BORDER_COLOR, &color, sizeof(color));
+				}
+				// Win11 中无条件禁用圆角
 				DWM_WINDOW_CORNER_PREFERENCE corner = DWMWCP_DONOTROUND;
 				DwmSetWindowAttribute(Handle(), DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(corner));
 			}
